@@ -378,10 +378,7 @@ module CFPropertyList
       raise CFFormatError.new("Invalid format or parser error!") if @value.nil?
     end
 
-    # Serialize CFPropertyList object to specified format and write it to file
-    # file = nil:: The filename of the file to write to. Uses +filename+ instance variable if nil
-    # format = nil:: The format to save in. Uses +format+ instance variable if nil
-    def save(file=nil,format=nil,opts={})
+    def get_content(format=nil,opts={})
       format = @format if format.nil?
       file = @filename if file.nil?
 
@@ -400,14 +397,27 @@ module CFPropertyList
 
       prsr = @@parsers[format-1].new
 
-      content = prsr.to_str(opts)
+      prsr.to_str(opts)
+
+    end
+
+    # Serialize CFPropertyList object to specified format and write it to file
+    # file = nil:: The filename of the file to write to. Uses +filename+ instance variable if nil
+    # format = nil:: The format to save in. Uses +format+ instance variable if nil
+    def save(file=nil,format=nil,opts={})
+      format = @format if format.nil?
+      file = @filename if file.nil?
+
+      if format != FORMAT_BINARY && format != FORMAT_XML && format != FORMAT_PLAIN
+        raise CFFormatError.new("Format #{format} not supported, use List::FORMAT_BINARY or List::FORMAT_XML")
+      end
+      content = get_content(format,opts)
 
       File.open(file, 'wb') {
         |fd|
         fd.write content
       }
-    end
-
+    end  
     # convert plist to string
     # format = List::FORMAT_BINARY:: The format to save the plist
     # opts={}:: Pass parser options
