@@ -386,11 +386,6 @@ module CFPropertyList
         raise CFFormatError.new("Format #{format} not supported, use List::FORMAT_BINARY or List::FORMAT_XML")
       end
 
-      if(!File.exists?(file)) then
-        raise IOError.new("File #{file} not writable!") unless File.writable?(File.dirname(file))
-      elsif(!File.writable?(file)) then
-        raise IOError.new("File #{file} not writable!")
-      end
 
       opts[:root] = @value
       opts[:formatted] = @formatted unless opts.has_key?(:formatted)
@@ -412,6 +407,12 @@ module CFPropertyList
         raise CFFormatError.new("Format #{format} not supported, use List::FORMAT_BINARY or List::FORMAT_XML")
       end
       content = get_content(format,opts)
+
+      if(!File.exists?(file)) then
+        raise IOError.new("File #{file} not writable!") unless File.writable?(File.dirname(file))
+      elsif(!File.writable?(file)) then
+        raise IOError.new("File #{file} not writable!")
+      end
 
       File.open(file, 'wb') {
         |fd|
